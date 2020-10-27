@@ -1,0 +1,12 @@
+version: '0.1.0'
+id: get_employee_info
+name: Get Employee Info
+description: 'Get employee information (name and salary)'
+inputs:
+    - employee_id
+outputs:
+    - employee_name
+    - employee_salary
+run:
+    provider: provider/default:0.1.0
+    handler: get_employee_info

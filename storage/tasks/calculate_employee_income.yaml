@@ -1,0 +1,11 @@
+version: '0.1.0'
+id: calculate_employee_income
+name: Get Employee Yearly Income
+description: 'Get yearly employee income'
+inputs:
+    - employee_salary
+outputs:
+    - employee_yearly_income
+run:
+    provider: provider/default:0.1.0
+    handler: calculate_employee_income
