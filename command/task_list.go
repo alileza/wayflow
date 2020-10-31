@@ -1,8 +1,8 @@
 package command
 
 import (
-	"fmt"
-
+	"github.com/fatih/color"
+	"github.com/rodaine/table"
 	"github.com/urfave/cli/v2"
 
 	"github.com/alileza/wayflow/workflow"
@@ -17,11 +17,16 @@ var TaskListCommand *cli.Command = &cli.Command{
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%s %s\t\t\t%s\t%s\n", "NO", "NAME", "VERSION", "DESCRIPTION")
-		for d, t := range tm.Tasks {
-			fmt.Printf("%d. %s\t%s\t%s\n", d+1, t.Name, t.Version, t.Description)
+
+		headerFmt := color.New(color.FgHiMagenta, color.Underline).SprintfFunc()
+		columnFmt := color.New(color.Bold).SprintfFunc()
+		tbl := table.New("ID", "Name", "Description")
+		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+		for _, t := range tm.Tasks {
+			tbl.AddRow(t.ID, t.Name, t.Description)
 		}
 
+		tbl.Print()
 		return nil
 	},
 }

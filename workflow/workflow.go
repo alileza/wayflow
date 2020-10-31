@@ -10,6 +10,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+type State string
+
+const (
+	StateInit = "init"
+)
+
 var (
 	ErrNotFound = errors.New("Not found")
 )
@@ -33,6 +39,11 @@ type WorkflowTask struct {
 
 type ArgumentKey string
 
+func (a ArgumentKey) TaskName() string {
+	l := strings.Split(string(a), ":")
+	return l[0]
+}
+
 func (a ArgumentKey) Key() string {
 	l := strings.Split(string(a), ":")
 	return l[len(l)-1]
@@ -43,9 +54,10 @@ type WorkflowArgumentMapping struct {
 	To   ArgumentKey `yaml:"to"`
 }
 
+// WorkflowManager manage workflow behaviour
 type WorkflowManager struct {
-	*TaskManager
-	Workflows []*Workflow
+	TaskManager *TaskManager
+	Workflows   []*Workflow
 }
 
 func NewWorkflowManager(storagePath string) (*WorkflowManager, error) {

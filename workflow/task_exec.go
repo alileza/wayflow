@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os/exec"
+	"time"
 )
 
 type TaskExecRequest struct {
@@ -14,10 +15,12 @@ type TaskExecRequest struct {
 }
 
 type TaskExecResponse struct {
-	Message string        `json:"message"`
-	Outputs TaskArguments `json:"outputs"`
-	Code    int64         `json:"code"`
-	Error   string        `json:"error,omitempty"`
+	Message  string        `json:"message"`
+	Inputs   TaskArguments `json:"inputs"`
+	Outputs  TaskArguments `json:"outputs"`
+	Code     int64         `json:"code"`
+	Error    string        `json:"error,omitempty"`
+	ExecTime time.Time     `json:"execution_time"`
 }
 
 func (tm *TaskManager) Exec(ctx context.Context, t *Task, args TaskArguments) (*TaskExecResponse, error) {
@@ -26,6 +29,9 @@ func (tm *TaskManager) Exec(ctx context.Context, t *Task, args TaskArguments) (*
 		Arguments: args,
 	}
 
+	var response TaskExecResponse
+	response.ExecTime = time.Now()
+	response.Inputs = args
 	cmd := exec.Command("docker", "run", "--rm", "-i", t.Run.Provider)
 	req, err := json.Marshal(request)
 	if err != nil {
@@ -43,7 +49,6 @@ func (tm *TaskManager) Exec(ctx context.Context, t *Task, args TaskArguments) (*
 		return nil, fmt.Errorf("%w: %s", err, stderr.String())
 	}
 
-	var response TaskExecResponse
 	if err := json.Unmarshal(body.Bytes(), &response); err != nil {
 		return nil, fmt.Errorf("unmarshal response error: %w: %s", err, body.String())
 	}

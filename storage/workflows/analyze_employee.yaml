@@ -2,9 +2,6 @@ version: '0.1.0'
 id: analyze_employee
 name: Analyze Employee
 description: 'Get employee information and calculate yearly income'
-mappings:
-    - from: get_employee_info
-      to: calculate_employee_income
 tasks:
     - name: get_employee_info
       task_id: get_employee_info
@@ -19,3 +16,6 @@ tasks:
     - name: get_employee_info_again
       task_id: get_employee_info
       dependencies: [get_employee_info, calculate_employee_income]
+      mappings:
+        - from: calculate_employee_income:employee_yearly_income
+          to: employee_yearly_income:yearly_income

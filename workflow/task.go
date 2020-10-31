@@ -10,16 +10,16 @@ import (
 )
 
 type Task struct {
-	Version     string   `yaml:"version"`
-	ID          string   `yaml:"id"`
-	Name        string   `yaml:"name"`
-	Description string   `yaml:"description"`
-	Inputs      []string `yaml:"inputs"`
-	Outputs     []string `yaml:"outputs"`
+	Version     string   `yaml:"version" json:"version"`
+	ID          string   `yaml:"id"  json:"id"`
+	Name        string   `yaml:"name" json:"name"`
+	Description string   `yaml:"description" json:"description"`
+	Inputs      []string `yaml:"inputs" json:"inputs"`
+	Outputs     []string `yaml:"outputs" json:"outputs"`
 	Run         struct {
-		Provider string `yaml:"provider"`
-		Handler  string `yaml:"handler"`
-	} `yaml:"run"`
+		Provider string `yaml:"provider" json:"provider"`
+		Handler  string `yaml:"handler" json:"handler"`
+	} `yaml:"run" json:"run"`
 }
 
 func (t *Task) GetExpectedInputs() map[string]struct{} {

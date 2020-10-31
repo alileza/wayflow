@@ -2,8 +2,10 @@ package command
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/urfave/cli/v2"
+	"gopkg.in/yaml.v2"
 
 	"github.com/alileza/wayflow/workflow"
 )
@@ -46,18 +48,29 @@ var WorkflowExecCommand *cli.Command = &cli.Command{
 				return err
 			}
 
-			arguments, err := parseArguments(WorkflowExecInputs.Arguments.Value(), task.GetExpectedInputs())
+			// verifing that arguments is meeting expectation of the tasks
+			expectedInputs := task.GetExpectedInputs()
+			for _, m := range wt.Mappings {
+				delete(expectedInputs, m.To.Key())
+			}
+			arguments, err := parseArguments(WorkflowExecInputs.Arguments.Value(), expectedInputs)
 			if err != nil {
 				return err
 			}
 			workflowArgument[wt.Name] = arguments
 		}
 
-		r, err := wm.Exec(c.Context, w, workflowArgument)
+		r, err := wm.ExecWorkflow(c.Context, w, workflowArgument)
 		if err != nil {
 			return err
 		}
-		fmt.Printf("%+v", r)
-		return nil
+
+		for k := range r.TaskExecResponses {
+			newKey := fmt.Sprintf("%d:%s", r.TaskExecResponses[k].ExecTime.Unix(), k)
+			r.TaskExecResponses[newKey] = r.TaskExecResponses[k]
+			delete(r.TaskExecResponses, k)
+		}
+
+		return yaml.NewEncoder(os.Stdout).Encode(r)
 	},
 }

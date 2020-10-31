@@ -1,8 +1,8 @@
 package command
 
 import (
-	"fmt"
-
+	"github.com/fatih/color"
+	"github.com/rodaine/table"
 	"github.com/urfave/cli/v2"
 
 	"github.com/alileza/wayflow/workflow"
@@ -18,11 +18,15 @@ var WorkflowListCommand *cli.Command = &cli.Command{
 			return err
 		}
 
-		fmt.Printf("%s %s\t\t\t%s\t%s\n", "NO", "NAME", "VERSION", "DESCRIPTION")
-		for d, w := range wm.Workflows {
-			fmt.Printf("%d. %s\t%s\t%s\n", d+1, w.Name, w.Version, w.Description)
+		headerFmt := color.New(color.FgHiMagenta, color.Underline).SprintfFunc()
+		columnFmt := color.New(color.Bold).SprintfFunc()
+		tbl := table.New("ID", "Name", "Version", "Description")
+		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+		for _, w := range wm.Workflows {
+			tbl.AddRow(w.ID, w.Name, w.Version, w.Description)
 		}
 
+		tbl.Print()
 		return nil
 	},
 }

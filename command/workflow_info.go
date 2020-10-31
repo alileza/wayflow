@@ -3,6 +3,8 @@ package command
 import (
 	"fmt"
 
+	"github.com/fatih/color"
+	"github.com/rodaine/table"
 	"github.com/urfave/cli/v2"
 
 	"github.com/alileza/wayflow/workflow"
@@ -34,14 +36,20 @@ var WorkflowInfoCommand *cli.Command = &cli.Command{
 			return err
 		}
 
-		fmt.Println("ID:", w.ID)
-		fmt.Println("Name:", w.Name)
-		fmt.Println("Description:", w.Description)
+		fmt.Printf("ID: %s\n", w.ID)
+		fmt.Printf("Name: %s\n", w.Name)
+		fmt.Printf("Description: %s\n", w.Description)
+		fmt.Printf("Version: %s\n", w.Version)
+		headerFmt := color.New(color.FgHiMagenta, color.Underline).SprintfFunc()
+		columnFmt := color.New(color.Bold).SprintfFunc()
+		tbl := table.New("Name", "Mapping", "Dependencies")
+		tbl.WithHeaderFormatter(headerFmt).WithFirstColumnFormatter(columnFmt)
+		for _, t := range w.Tasks {
+			tbl.AddRow(t.Name, t.Mappings, t.Dependencies)
+		}
+		tbl.AddRow(w.ID, w.Name, w.Version, w.Description)
 
-		// g := workflow.NewGraph(w)
-		// fmt.Printf("%s\n", g.Dot(&dag.DotOpts{}))
-		// fmt.Printf("Graph: %v\n", w.Tasks)
-
+		tbl.Print()
 		return nil
 	},
 }
